@@ -45,45 +45,30 @@ def scrape():
     # ## Mars Weather
 
     twitter_url = "https://twitter.com/marswxreport?lang=en"
-    twitter_page = requests.get(twitter_url)
 
+    # use requests library to read in Twitter page
+    twitter_page = requests.get(twitter_url)
     soup = BeautifulSoup(twitter_page.content, 'html.parser')
 
+    # find first tweet and clean it
     first_tweet = soup.find_all("div", class_="js-tweet-text-container")[0]
-    mars_weather_tweet = first_tweet.find("p").get_text()
+    mars_weather_tweet = first_tweet.find("p").get_text().replace("\n","").split("pic.twitter.com")[0]
 
 
     # ## Mars Facts
 
     mars_facts_url = "https://space-facts.com/mars/"
 
-    browser = init_browser()
-    browser.visit(mars_facts_url)
-    html = browser.html
-    soup = BeautifulSoup(html, 'html.parser')
+    # use pandas to read table directly from URL
+    mars_facts_df = pd.read_html(mars_facts_url)[1]
 
-    mars_facts_table = soup.find_all("table", id="tablepress-p-mars")[0]
-
-    # get the types of facts
-    topics = []
-    for row in mars_facts_table.find_all("td",class_="column-1"):
-        topic_text = row.get_text().replace(":","")
-        topics.append(topic_text)
-
-    # get the measurements of the facts
-    measurements = []
-    for row in mars_facts_table.find_all("td",class_="column-2"):
-        measurements.append(row.get_text())
-
-    # combine topics and measurements into single dictionary
-    mars_facts_dict = {}
-
-    for i in range(len(topics)):
-        mars_facts_dict[topics[i]] = measurements[i]
-
-    # close browser after scraping
-    browser.quit()
-
+    # clean up resulting DataFrame
+    mars_facts_df.columns = ["description", "value"]
+    mars_facts_df["description"] = mars_facts_df["description"].str.replace(":","")
+ 
+    # save as dictionary to save in MongoDB
+    mars_facts_df.set_index("description", inplace=True)
+    mars_facts_dict = mars_facts_df.to_dict()["value"]
 
     # ## Mars Hemispheres
 
