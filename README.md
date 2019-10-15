@@ -20,3 +20,8 @@ The following websites were scraped and data obtained:
 * [USGS Astrogeology site](https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars): high resolution images for each of Mar's hemispheres
 
 This data was then stored in a MongoDB collection. This collection is accessed in a Flask app and HTML template (using Jinja) to create the resulting webpage:
+
+![image](webpage_img1.png)
+*Fig. 1: Flask application webpage top*
+![image](webpage_img2.png)
+*Fig. 2: Flask application webpage bottom*
