@@ -16,15 +16,6 @@ def home():
     # Find one record of data from the mongo database
     latest_mars_data = mongo.db.collection.find_one()
 
-    if latest_mars_data is None:
-        latest_mars_data = {
-            "nasa_mars":{"title":"news_title", "paragraph":"news_paragraph"},
-            "jpl_image":"featured_image_url",
-            "mars_latest_tweet": "mars_weather_tweet",
-            "mars_facts":{},
-            "mars_hemisphere":{}
-            }
-
     # Return template and data
     return render_template("index.html", data=latest_mars_data)
 

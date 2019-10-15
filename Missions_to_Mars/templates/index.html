@@ -25,8 +25,8 @@
     <div>
       <p>
         <h3>Latest Mars News</h3>
-        <h4>{{ data.nasa_mars["title"]}}</h4>
-        {{ data.nasa_mars["paragraph"] }}
+        <h4>{{ data.nasa_mars_title}}</h4>
+        {{ data.nasa_mars_paragraph }}
       </p>
     </div>
 
@@ -49,18 +49,7 @@
 
           <div>
             <h4>Mars Facts</h4>
-            <table>
-              <tr>
-                <th>Description</th>
-                <th>Value</th>
-              </tr>
-              {% for key, value in data.mars_facts.items() %}
-                <tr>
-                  <td>{{key}}</td>
-                  <td>{{value}}</td>
-                </tr>
-              {% endfor %}
-            </table>
+            {{data.mars_facts | safe}}
           </div> 
 
         </div>

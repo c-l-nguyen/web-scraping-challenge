@@ -4,18 +4,23 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from splinter import Browser
+from time import sleep
 
 def init_browser():
     executable_path = {"executable_path": "/usr/local/bin/chromedriver"}
     return Browser("chrome", **executable_path, headless=False)
 
 def scrape():
+    # initialize return variable
+    mars_data = {}
+
     # ## NASA Mars News
 
     nasa_mars_url = "https://mars.nasa.gov/news/"
 
     browser = init_browser()
     browser.visit(nasa_mars_url)
+    sleep(5)
     soup = BeautifulSoup(browser.html, 'html.parser')
 
     news_title = soup.find_all("div", class_="content_title")[0].get_text()
@@ -32,8 +37,9 @@ def scrape():
     browser = init_browser()
     browser.visit(jpl_url)
 
-    browser.click_link_by_partial_text(news_title)
-    browser.click_link_by_partial_text("Full image and caption")
+    browser.click_link_by_partial_text("FULL IMAGE")
+    sleep(5) # add in lag to allow loading
+    browser.click_link_by_partial_text("more info")
     browser.click_link_by_partial_text(".jpg")
 
     featured_image_url = browser.url
@@ -66,9 +72,10 @@ def scrape():
     mars_facts_df.columns = ["description", "value"]
     mars_facts_df["description"] = mars_facts_df["description"].str.replace(":","")
  
-    # save as dictionary to save in MongoDB
+    # convert to HTML string
     mars_facts_df.set_index("description", inplace=True)
-    mars_facts_dict = mars_facts_df.to_dict()["value"]
+    mars_facts_html = mars_facts_df.to_html()
+
 
     # ## Mars Hemispheres
 
@@ -98,10 +105,11 @@ def scrape():
     browser.quit()
 
     mars_data = {
-        "nasa_mars":{"title":news_title, "paragraph":news_paragraph},
+        "nasa_mars_title":news_title,
+        "nasa_mars_paragraph":news_paragraph,
         "jpl_image":featured_image_url,
         "mars_latest_tweet": mars_weather_tweet,
-        "mars_facts":mars_facts_dict,
+        "mars_facts":mars_facts_html,
         "mars_hemisphere":hemisphere_image_urls
     }
 
